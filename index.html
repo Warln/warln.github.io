@@ -1,0 +1,38 @@
+<script type="text/javascript" src="//cdn.bootcss.com/KaTeX/0.5.1/katex.min.js"></script>
+<script type="text/javascript" src="//cdn.bootcss.com/KaTeX/0.5.1/contrib/auto-render.min.js"></script>
+<link rel="stylesheet" href="//cdn.bootcss.com/KaTeX/0.5.1/katex.min.css"/>
+<script>
+renderMathInElement(document.body,
+{delimiters: [
+{left: "$$", right: "$$", display: true},
+{left: "\\[", right: "\\]", display: true},
+{left: "$", right: "$", display: false},
+{left: "\\(", right: "\\)", display: false}]
+});
+</script>
+<body>
+<p>
+<h1>证法一:</h1>
+证明: 有一公式<br /><br />
+\(a^n-1=(a-1)(a^{n-1}+a^{n-2}+\dots+a+1)\)<br /><br />
+此公式是由等比数列前n项和公式得出的, 即<br /><br />
+首项为\(a_1=1\), 公比为\(q=a\)的数列的前n项相加<br /><br />
+\(S_n=1+a+a^2+\dots+a^{n-1}=\cfrac{a_1(1-q^n)}{1-q}=\cfrac{a_1(q^n-1)}{q-1}=\cfrac{a^n-1}{a-1}\)<br /><br />将右边分母\(a-1\)乘到左边,所以\(a^n-1=(a-1)(a^{n-1}+a^{n-2}+\dots+a+1)\)<br /><br />
+以此公式推导<br /><br />
+\(\frac{(1+x)^{\frac 1n}-1}{\frac xn}=\frac{n(1+x)^{\frac 1n}-1)}{x}\quad(*)\)<br /><br />
+将分子、分母同乘以<br /><br />
+\((1+x)^{\frac{n-1}{n}}+(1+x)^{\frac{n-2}{n}}+\dots+(1+x)^{\frac{1}{n}}+1\quad(**)\)<br /><br />
+(*)式分子\(=n[(1+x)-1]=nx\)<br /><br />
+又\(\because x→0,\\therefore(**)→n\)<br /><br />
+所以(*)式分母\(→nx\)<br /><br />
+所以\(\frac{(1+x)^{\frac1n}-1}{\frac{x}n}=\frac{n[(1+x)^{\frac1n}-1]}{x}\to \frac{nx}{nx}=1\)<br /><br />
+所以\({(1+x)^{\frac1n}-1}\sim \frac xn\)
+</p>
+<p>
+<h1>证法二:</h1>
+证明: 令\((1+x)^{\frac1n}-1=t,\)<br /><br />
+则\(x\to0\)时\(t\to0,x=(1+t)^n-1\)<br /><br />
+\(\quad\lim\limits_{x\to0}\frac{\frac xn}{(1+x)^\frac1n-1}\\=\lim\limits_{x\to0}\frac{(1+t)^n-1}{nt})\\=\lim\limits_{x\to0}\frac{C_n^1+C_n^2{t}+C_n^3{t^2}+\dots+C_n^n{t^{n-1}}}n\\=\frac nn\\=1\)<br /><br />
+这里\(C_n^m\)表示组合数,\(C_n^m=\frac{n!}{m!(n-m)!}\)
+</p>
+</body>
