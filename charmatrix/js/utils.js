@@ -15,14 +15,6 @@ function vcv(v, visW, visH){
 	return v;
 }
 
-
-var msg = layer.msg;
-window.onload = function(){
-	layer.msg(vcv);
-	//msg(vcv);
-};
-
-
 var refresh = function(char, rows, columns, angle, threshold){
 	this.clearAll();
 	this.drawGrid(rows, columns);
