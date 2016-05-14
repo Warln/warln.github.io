@@ -1,0 +1,17 @@
+li{
+	display: inline;
+}
+#matrix span{
+	letter-spacing: 0.5em;
+	color: gray;
+}
+#matrix span.dots{
+	margin: 0;
+	padding: 0;
+	line-height: 0.8em;
+	border: 1px solid gray;
+}
+#matrix span.cdot{
+	color: #f75c2f;
+	text-shadow: 0 0 7px red;
+}
