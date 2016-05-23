@@ -1,2 +1,2 @@
 # Warln
-[Warln.github.com](Warln.github.com)
+[Warln.github.io](Warln.github.io)
