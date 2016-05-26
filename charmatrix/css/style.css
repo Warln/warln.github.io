@@ -1,16 +1,25 @@
 li{
 	display: inline;
 }
-#matrix span{
-	letter-spacing: 0.5em;
-	color: gray;
+#cvs{
+	border-radius: 5px;
 }
-#matrix span.dots{
-	margin: 0;
-	padding: 0;
-	line-height: 0.8em;
+#mtr{
+	position: fixed;
+	right: .5em;
+	bottom: 3em;
+	background-color: #f3f3f3;
+	border: 1px solid #c0c6c9;
+	border-radius: 5px;
 }
-#matrix span.cdot{
-	color: #f75c2f;
-	text-shadow: 0 0 7px red;
+.toggle{
+	display: block;
+	position: fixed;
+	right: .5em;
+	bottom: .5em;
+	color: #FFF;
+	background-color: #04BE02;
+	padding: 4px 16px;
+	border-radius: 5px;
+	box-shadow: 0 0 8px rgba(0,0,0,0.4);
 }
