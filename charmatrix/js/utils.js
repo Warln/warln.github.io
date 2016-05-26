@@ -12,19 +12,24 @@ function vcv(v, visW, visH){
 	v.refresh = refresh;
 	v.getDt = getDt;
 	v.bhatch = bhatch;
+	v.getMousePos = getMousePos;
 	return v;
 }
 
-var refresh = function(char, rows, columns, angle, threshold){
+var refresh = function(char, rows, columns, getby, angle, threshold){
 	this.clearAll();
 	this.drawGrid(rows, columns);
-	if(arguments[3] % 90 === 0){
+	if(typeof arguments[3] == 'number' && arguments[3] % 90 === 0){
 		this.drawText(char, arguments[3]);
 		var bin = this.getBins(rows, columns);
 	}
-	else{
+	else if(typeof arguments[3] == 'string'){
 		this.drawText(char);
 		var bin = this.getBins(rows, columns, arguments[3]);
+	}
+	else{
+		this.drawText(char);
+		var bin = this.getBins(rows, columns, getby, arguments[3]);
 	}
 	var binLen = bin.length;
 	var dt = [];
@@ -33,8 +38,8 @@ var refresh = function(char, rows, columns, angle, threshold){
 	}
 	return dt;
 };
-var getDt = function(rows, columns, threshold){
-	var bin = this.getBins(rows, columns, threshold);
+var getDt = function(rows, columns, getby, threshold){
+	var bin = this.getBins(rows, columns, getby, threshold);
 	var binLen = bin.length;
 	var dt = [];
 	for(var d = 0; d < binLen; d += columns){
@@ -54,26 +59,28 @@ var clearAll = function(){
 //参数:
 //data - 数组类型,要填充进网格的数据
 //返回: 无返回值
-var bhatch = function(data){
+var bhatch = function(data, rows, columns){
+	//var rows = rows || data.join('').length/data.length,
+	//	columns = columns || data.length;
 	this.save();
-	this.font = this.canvas.width/this.matrix.columns > this.canvas.height/this.matrix.rows
-		? (this.canvas.height/this.matrix.rows)
-		: (this.canvas.width/this.matrix.columns)
+	this.font = this.canvas.width/columns > this.canvas.height/rows
+		? (this.canvas.height/rows)
+		: (this.canvas.width/columns)
 		+ 'px'
 		+ ' '
-		+ this.ft.family;
+		+ 'arial';
 	//设置填充颜色样式
-	this.fillStyle = 'rgba(0, 0, 0, .5)';
+	this.fillStyle = 'rgba(255, 77, 77, .5)';
 	//设置文字水平基线到中线
 	this.textAlign = 'center';
 	//设置文字竖直基线到中线
 	this.textBaseline = 'middle';
-	for(var x = 0; x < this.matrix.columns; x++){
-		for(var y = 0; y < this.matrix.rows; y++){
+	for(var x = 0; x < columns; x++){
+		for(var y = 0; y < rows; y++){
 			this.fillText(
-				bin[x * this.matrix.columns + y],
-				this.canvas.width/this.matrix.columns * y + this.canvas.width/this.matrix.columns/2,
-				this.canvas.height/this.matrix.rows * x + this.canvas.height/this.matrix.rows/2
+				data[x * columns + y],
+				this.canvas.width/columns * y + this.canvas.width/columns/2,
+				this.canvas.height/rows * x + this.canvas.height/rows/2
 			);
 		}
 	}
@@ -116,23 +123,76 @@ var getBin = function(startX, startY, byX, byY, threshold){
 //参数:
 //rows - 网格划分单元的行数,
 //columns - 网格划分单元的列数,
+//getby - 默认值为'byrow'，表示按行，'bycolumn'表示按列,
 //threshold - 二值化依据的阈值
 //返回:
 //数组 - 网格单元二值化对应的数组
-var getBins = function(rows, columns, threshold){
+var getBins = function(rows, columns, getby, threshold){
+	var getby = getby || 'byrow';
 	var bins = [];
-	for(var x = 0; x < columns; x++){
-		for(var y = 0; y < rows; y++){
-			bins.push(
-				this.getBin(
-					y * this.canvas.width/columns,
-					x * this.canvas.height/rows,
-					this.canvas.width/columns,
-					this.canvas.height/rows,
-					threshold
-				)
-			);
+	var byX = getby === 'byrow' ? this.canvas.width/columns : this.canvas.height/rows;
+	var byY = getby === 'byrow' ? this.canvas.height/rows : this.canvas.width/columns;
+	if(getby === 'byrow'){
+		for(var x = 0; x < columns; x++){
+			for(var y = 0; y < rows; y++){
+				bins.push(
+					this.getBin(
+						y * this.canvas.width/columns,
+						x * this.canvas.height/rows,
+						byX,
+						byY,
+						threshold
+					)
+				);
+			}
 		}
+	}
+	if(getby === 'reversedrows'){
+		for(var x = 0; x < columns; x++){
+			for(var y = 0; y < rows; y++){
+				bins.push(
+					this.getBin(
+						y * this.canvas.width/columns,
+						x * this.canvas.height/rows,
+						byX,
+						byY,
+						threshold
+					)
+				);
+			}
+		}
+		bins.reverse();
+	}
+	if(getby === 'bycolumn'){
+		for(var x = 0; x < columns; x++){
+			for(var y = 0; y < rows; y++){
+				bins.push(
+					this.getBin(
+						x * this.canvas.height/rows,
+						y * this.canvas.width/columns,
+						byX,
+						byY,
+						threshold
+					)
+				);
+			}
+		}
+	}
+	if(getby === 'reversedcolumns'){
+		for(var x = 0; x < columns; x++){
+			for(var y = 0; y < rows; y++){
+				bins.push(
+					this.getBin(
+						x * this.canvas.height/rows,
+						y * this.canvas.width/columns,
+						byX,
+						byY,
+						threshold
+					)
+				);
+			}
+		}
+		bins.reverse();
 	}
 	return bins;
 };
@@ -287,11 +347,11 @@ var drawText = function(opts){
 //坐标对象 - 成员:
 //x - Canvas上鼠标事件的横坐标,
 //y - Canvas上鼠标事件的纵坐标
-function getMousePos(cvs, evt){
-	var rect = cvs.getBoundingClientRect();
+function getMousePos(evt){
+	var rect = this.canvas.getBoundingClientRect();
 	return {
-		x: evt.clientX - rect.left,
-		y: evt.clientY - rect.top
+		x: (evt.clientX - rect.left) * (window.devicePixelRatio || 1),
+		y: (evt.clientY - rect.top) * (window.devicePixelRatio || 1)
 	};
 }
 
