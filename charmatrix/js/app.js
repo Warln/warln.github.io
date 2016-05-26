@@ -14,10 +14,11 @@ var V = new Vue({
 	data: {
 		strs: {
 			chars: '字狐狸精神果醋',
-			currentChar: '果',
+			currentChar: '醋',
 			direct: [0, 0, 0, 0, 0, 0, 0]
 		},
 		cvsCtx: document.querySelector('#cvs').getContext('2d'),
+		mtrCtx: document.querySelector('#mtr').getContext('2d'),
 		grid: {
 			cellW: 40,
 			cellH: 40,
@@ -25,9 +26,11 @@ var V = new Vue({
 			maxH: 320
 		},
 		matrix: {
-			rows: 8,
-			columns: 8,
+			rows: 16,
+			columns: 16,
 			rowcols: 16,
+			shows: false,
+			getby: 'byrow',
 			dt: [],
 			threshold: .47
 		},
@@ -36,7 +39,7 @@ var V = new Vue({
 			variant: 'normal',
 			weight: '100',
 			size: '',
-			family: 'arial'
+			family: 'monospace'
 		},
 		dotsStyle: {
 			sw: 0,
@@ -67,21 +70,35 @@ var V = new Vue({
 				) + 'px'
 			);
 		},
+		mtr: function(){
+			return new vcv(
+				this.mtrCtx,
+				(
+					this.matrix.rows * this.grid.cellW >= this.grid.maxW
+						? this.grid.maxW
+						: this.matrix.rows * this.grid.cellW
+				) + 'px',
+				(
+					this.matrix.columns * this.grid.cellH >= this.grid.maxH
+						? this.grid.maxH
+						: this.matrix.columns * this.grid.cellH
+				) + 'px'
+			);
+		},
 		dots: function(){
-			var dt = this.matrix.dt;
-			var dtlen = dt.length;
+			var mdt = this.matrix.dt;
+			var mdtlen = mdt.length;
 			var val = [];
-			for(var i = 0; i < dtlen; i++){
-				val.push(dt[i]);
+			for(var i = 0; i < mdtlen; i++){
+				val.push(mdt[i]);
 			}
 			for(var indx in val){
 				if(val.hasOwnProperty(indx)){
 					val[indx] = val[indx].replace(/0/g, this.dotsStyle.current[0]);
-					val[indx] = val[indx].replace(/1/g, '<span class="cdot">' + this.dotsStyle.current[1] + '</span>');
-					val[indx] = '<span class="dots">' + val[indx] + '</span>' + '<br>';
+					val[indx] = val[indx].replace(/1/g, this.dotsStyle.current[1]);
 				}
 			}
-			return val.join('');
+			return val;
 		}
 	},
 	methods: {
@@ -101,9 +118,34 @@ var V = new Vue({
 			this.dotsStyle.current = styleLibs['' + styles[this.dotsStyle.sw++]];
 			this.dotsStyle.sw = this.dotsStyle.sw === styles.length ? 0 : this.dotsStyle.sw;
 		},
+		reversedrow: function(){
+			for(var c in this.matrix.dt){
+				if(this.matrix.dt.hasOwnProperty(c)){
+					//this.matrix.dt.splice(c, 1, this.matrix.dt[c].reverse());
+					//this.matrix.dt[c] = this.matrix.dt[c].reverse();
+				}
+			}
+		},
+		reversedcolumn: function(){
+			for(var c in this.matrix.dt){
+				if(this.matrix.dt.hasOwnProperty(c)){
+					this.matrix.dt[c] = this.matrix.dt[c].reverse(0);
+				}
+			}
+		},
+		swBin: function(evt){
+			var evt = evt || window.event;
+			var tgt = evt.target || evt.srcElement;
+			var pos = tgt.getContext('2d').getMousePos(evt);
+			var r = ~~(pos.x / (this.mtr.canvas.width/this.matrix.rows));
+			var c = ~~(pos.y / (this.mtr.canvas.height/this.matrix.columns));
+			var dtc = this.matrix.dt[c].split('');
+			dtc[r] = dtc[r] == 0 ? 1 : 0;
+			this.matrix.dt.splice(c, 1, dtc.join(''));
+		},
 		rtt: function(evt){
 			var evt = evt || window.event;
-			var tgt = evt.target || ev.srcElement;
+			var tgt = evt.target || evt.srcElement;
 			var chr = tgt.innerText;
 			var indx = this.strs.chars.indexOf(chr);
 			this.strs.direct[indx] = +this.strs.direct[indx] + 90;
@@ -138,6 +180,13 @@ var V = new Vue({
 		},
 		'matrix.threshold': function(current, prev){
 			this.matrix.dt = this.vv.refresh(this.strs.currentChar, this.matrix.rows, this.matrix.columns, current);
+		},
+		'matrix.getby': function(current, prev){
+			this.matrix.dt = this.vv.refresh(this.strs.currentChar, this.matrix.rows, this.matrix.columns, current);
+		},
+		'dots': function(current, prev){
+			this.mtr.clearAll();
+			this.mtr.bhatch(current.join(''), current.length, current.join('').length/current.length);
 		}
 	},
 	ready: function(){
@@ -146,7 +195,6 @@ var V = new Vue({
 		//在Canvas上绘制文字
 		this.vv.drawText(this.strs.currentChar);
 		//在对应网格单元中绘制出二值化后的文本值
-		
 		this.matrix.dt = this.vv.refresh(this.strs.currentChar, this.matrix.rowcols, this.matrix.rowcols);
 	}
 });
