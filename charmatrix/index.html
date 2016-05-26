@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0;">
 <title>字模转换</title>
-<link rel="stylesheet" href="css/normalize.css">
-<link rel="stylesheet" href="css/milligram.css">
+<link rel="stylesheet" href="css/mill.css">
 <link rel="stylesheet" href="css/label.css">
 <link rel="stylesheet" href="css/style.css">
 <script src="js/vue.js"></script>
 <script src="js/utils.js"></script>
+<script src="js/notie.js"></script>
 </head>
 <body class="container">
 <header class="row">
@@ -31,6 +31,8 @@
 					<a class="detail" @click="matrix.rowcols++">＋1</a>
 					<a class="detail" @click="matrix.rowcols -= 4">－4</a>
 					<a class="detail" @click="matrix.rowcols += 4">＋4</a>
+					<a class="detail" @click="matrix.rowcols -= 8">－8</a>
+					<a class="detail" @click="matrix.rowcols += 8">＋8</a>
 				</label>
 				<input id="mtxRC" type="text" v-model="matrix.rowcols > 2 ? matrix.rowcols : 2" number>
 			</div>
@@ -39,6 +41,8 @@
 					<span>阈值</span>
 					<a class="detail" @click="matrix.threshold -= .01">－.01</a>
 					<a class="detail" @click="matrix.threshold += .01">＋.01</a>
+					<a class="detail" @click="matrix.threshold -= .05">－.05</a>
+					<a class="detail" @click="matrix.threshold += .05">＋.05</a>
 					<a class="detail" @click="matrix.threshold -= .1">－.1</a>
 					<a class="detail" @click="matrix.threshold += .1">＋.1</a>
 				</label>
@@ -53,6 +57,8 @@
 					<a class="detail" @click="matrix.rows++">＋1</a>
 					<a class="detail" @click="matrix.rows -= 8">－8</a>
 					<a class="detail" @click="matrix.rows += 8">＋8</a>
+					<a class="detail" @click="matrix.rows -= 16">－16</a>
+					<a class="detail" @click="matrix.rows += 16">＋16</a>
 				</label>
 				<input id="mtxR" type="text" v-model="matrix.rows > 2 ? matrix.rows : 2" number>
 			</div>
@@ -63,18 +69,20 @@
 					<a class="detail" @click="matrix.columns++">＋1</a>
 					<a class="detail" @click="matrix.columns -= 8">－8</a>
 					<a class="detail" @click="matrix.columns += 8">＋8</a>
+					<a class="detail" @click="matrix.columns -= 16">－16</a>
+					<a class="detail" @click="matrix.columns += 16">＋16</a>
 				</label>
 				<input id="mtxC" type="text" v-model="matrix.columns > 2 ? matrix.columns : 2" number>
 			</div>
 		</div>
 		<div class="row">
 			<span class="column">
-				<a class="">按行</a>
-				<a class="">按列</a>
-				<a class="">左右翻转</a>
-				<a class="">上下翻转</a>
-				<a class="">按行反向</a>
-				<a class="">按列反向</a>
+				<a class="" @click="matrix.getby='byrow'">按行↦</a>
+				<a class="" @click="matrix.getby='bycolumn'">按列↧</a>
+				<a class="" @click="reversedrow">按行反向↤</a>
+				<a class="">按列反向↥</a>
+				<a class="" @click="matrix.getby='reversedrows'">中心旋转↷</a>
+				<a class="" @click="matrix.getby='reversedcolumns'">副对角线翻转↙↗</a>
 			</span>
 		</div>
 		<div class="row">
@@ -96,23 +104,24 @@
 		<div class="row">
 			<span class="column">
 				<label>十六进制:</label>
-				<span class="result" contenteditable>{{ matrix.dt | tohex}}</span>
+				<span class="result" contenteditable>{{ matrix.dt | tohex }}</span>
 			</span>
 		</div>
 	</nav>
 	<section class="column">
 		<div class="row">
 			<span class="column">
-				<canvas id="cvs">Canvas Unsupported!</canvas>
+				<canvas id="cvs" @click="swBin($event)">Canvas Unsupported!</canvas>
 			</span>
-		</div>
-		<div class="row">
-			<article class="column" id="matrix" @click="swDotsStyle">
-				<span>{{{ dots }}}</span>
-			</article>
 		</div>
 	</section>
 </main>
+<footer>
+	<article v-show="matrix.shows">
+		<canvas id="mtr" @click="swBin($event)">Canvas Unsupported!</canvas>
+	</article>
+	<a class="toggle" @click="matrix.shows = !matrix.shows">查看</a>
+</footer>
 <script src="js/app.js"></script>
 </body>
 </html>
